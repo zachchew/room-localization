@@ -3,7 +3,7 @@ from rclpy.node import Node
 import cv2
 import numpy as np
 import json
-from autolab_core import RigidTransform
+from aruco_localizer.transforms import RigidTransform
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 from tf2_ros import TransformBroadcaster
@@ -11,6 +11,16 @@ from geometry_msgs.msg import TransformStamped
 from builtin_interfaces.msg import Time
 from .utils import ARUCO_DICT
 from geometry_msgs.msg import PoseStamped
+from ament_index_python.packages import get_package_share_directory
+import os
+
+pkg_path = get_package_share_directory('aruco_localizer')
+calib_file = os.path.join(pkg_path, 'aruco_localizer', 'calibration_matrix.npy')
+dist_file = os.path.join(pkg_path, 'aruco_localizer', 'distortion_coefficients.npy')
+tag_map_path = os.path.join(pkg_path, "aruco_localizer", "tag_map.json")
+
+if not os.path.exists(calib_file) or not os.path.exists(dist_file) or not os.path.exists(tag_map_path):
+    raise FileNotFoundError(f"Calibration files not found in {pkg_path}. Please check the package structure.")
 
 class ArucoLocalizer(Node):
     def __init__(self):
@@ -18,11 +28,11 @@ class ArucoLocalizer(Node):
         self.get_logger().info("Aruco Localizer Node Started")
 
         # Load camera parameters
-        self.K = np.load("calibration_matrix.npy")
-        self.D = np.load("distortion_coefficients.npy")
+        self.K = np.load(calib_file)
+        self.D = np.load(dist_file)
 
         # Load tag map
-        with open("tag_map.json", "r") as f:
+        with open(tag_map_path, "r") as f:
             self.tag_map = json.load(f)
 
         self.tag_length = 0.1  # meters

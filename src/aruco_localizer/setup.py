@@ -11,7 +11,14 @@ setup(
         ('share/' + package_name + '/resource', ['resource/' + package_name]),
         ('share/' + package_name + '/launch', ['launch/full_localization.launch.py']),
         ('share/' + package_name + '/rviz', ['rviz/localization_config.rviz']),
-        ('share/' + package_name + '/resource', ['resource/aruco_localizer'])
+        ('share/' + package_name + '/resource', ['resource/aruco_localizer']),
+        ('share/' + package_name + '/aruco_localizer', [
+            'aruco_localizer/calibration_matrix.npy',
+            'aruco_localizer/distortion_coefficients.npy',
+            'aruco_localizer/tag_map.json',
+            'aruco_localizer/utils.py'
+            ]
+        )
     ],
     install_requires=['setuptools'],
     zip_safe=True,
